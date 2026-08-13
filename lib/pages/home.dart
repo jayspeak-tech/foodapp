@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/model/category_model.dart';
+import 'package:myapp/model/pizzamodel.dart';
 import 'package:myapp/service/category_data.dart';
+import 'package:myapp/service/pizza_data.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -11,12 +13,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<CategoryModel> categories = [];
+  List<PizzaModel> pizza = [];
   String selectedCategory = "0";
 
   @override
   void initState() {
     super.initState();
     categories = getCategories();
+    pizza = getPizza();
   }
 
   @override
@@ -91,6 +95,58 @@ class _HomeState extends State<Home> {
                         selectedCategory = index.toString();
                       });
                     },
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 20.0),
+            Expanded(
+              child: GridView.builder(
+                padding: EdgeInsets.zero,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 10.0,
+                  crossAxisSpacing: 10.0,
+                  childAspectRatio: 0.7,
+                ),
+                itemCount: pizza.length,
+                itemBuilder: (context, index) {
+                  final item = pizza[index];
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    padding: EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              item.image ?? '',
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          item.name ?? '',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
