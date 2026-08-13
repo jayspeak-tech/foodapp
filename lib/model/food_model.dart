@@ -1,8 +1,10 @@
-class PizzaModel {
+// lib/model/food_model.dart (replaces pizzamodel.dart and burger_model.dart)
+
+class FoodModel {
   String? name;
   String? image;
-  String? description;
-  double? price;
+  int? price;
+  String? categoryId;
 
-  PizzaModel({this.name, this.image, this.description, this.price});
+  FoodModel({this.name, this.image, this.price, this.categoryId});
 }

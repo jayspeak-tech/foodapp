@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/model/category_model.dart';
-import 'package:myapp/model/pizzamodel.dart';
+import 'package:myapp/model/food_model.dart';
 import 'package:myapp/service/category_data.dart';
-import 'package:myapp/service/pizza_data.dart';
+import 'package:myapp/service/food_data.dart';
+import 'package:myapp/pages/food_details.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,41 +14,42 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<CategoryModel> categories = [];
-  List<PizzaModel> pizza = [];
+  List<FoodModel> allFood = [];
   String selectedCategory = "0";
 
   @override
   void initState() {
     super.initState();
     categories = getCategories();
-    pizza = getPizza();
+    allFood = getFood();
   }
+
+  List<FoodModel> get filteredFood =>
+      allFood.where((item) => item.categoryId == selectedCategory).toList();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        margin: EdgeInsets.only(left: 20.0, top: 40.0),
+        margin: EdgeInsets.only(left: 20.0, right: 20.0, top: 40.0),
         child: Column(
           children: [
+            // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Image.asset(
-                      "images/logo.png",
-                      height: 50,
-                      width: 110,
-                      fit: BoxFit.contain,
-                    ),
+                    Image.asset("images/logo.png", height: 50, width: 110, fit: BoxFit.contain),
                     Text("Order your favourite food!"),
                   ],
                 ),
               ],
             ),
             SizedBox(height: 30.0),
+
+            // Search bar
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -61,13 +63,13 @@ class _HomeState extends State<Home> {
                     child: TextField(
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: "Search",
+                        hintText: "Search food item...",
+                        contentPadding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
                       ),
                     ),
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(right: 10.0),
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: Color(0xffef2b39),
@@ -78,6 +80,8 @@ class _HomeState extends State<Home> {
               ],
             ),
             SizedBox(height: 20.0),
+
+            // Category row
             Container(
               height: 60,
               child: ListView.builder(
@@ -86,69 +90,51 @@ class _HomeState extends State<Home> {
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
                   return CategoryTile(
-                    image: categories[index].image!,
                     name: categories[index].name!,
-                    categoryindex: index.toString(),
+                    image: categories[index].image!,
+                    categoryindex: categories[index].id!,
                     selectedCategory: selectedCategory,
                     onTap: () {
                       setState(() {
-                        selectedCategory = index.toString();
+                        selectedCategory = categories[index].id!;
                       });
                     },
                   );
                 },
               ),
             ),
-            SizedBox(height: 20.0),
+            SizedBox(height: 10.0),
+
+            // Food grid — filtered by selected category
             Expanded(
-              child: GridView.builder(
-                padding: EdgeInsets.zero,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 10.0,
-                  crossAxisSpacing: 10.0,
-                  childAspectRatio: 0.7,
+              child: Container(
+                margin: EdgeInsets.only(right: 10.0),
+                child: GridView.builder(
+                  padding: EdgeInsets.zero,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.69,
+                    mainAxisSpacing: 20.0,
+                    crossAxisSpacing: 15.0,
+                  ),
+                  itemCount: filteredFood.length,
+                  itemBuilder: (context, index) {
+                    final item = filteredFood[index];
+                    return FoodTile(
+                      name: item.name!,
+                      image: item.image!,
+                      price: item.price!,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FoodDetails(foodModel: item),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
-                itemCount: pizza.length,
-                itemBuilder: (context, index) {
-                  final item = pizza[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    padding: EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.asset(
-                              item.image ?? '',
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          item.name ?? '',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
               ),
             ),
           ],
@@ -163,6 +149,7 @@ class CategoryTile extends StatelessWidget {
   final VoidCallback onTap;
 
   const CategoryTile({
+    super.key,
     required this.name,
     required this.image,
     required this.categoryindex,
@@ -192,14 +179,62 @@ class CategoryTile extends StatelessWidget {
               fit: BoxFit.cover,
             ),
             SizedBox(width: isSelected ? 8.0 : 10.0),
-            Text(
-              name,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-              ),
-            ),
+            Text(name, style: TextStyle(color: isSelected ? Colors.white : Colors.black)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class FoodTile extends StatelessWidget {
+  final String name, image;
+  final int price;
+  final VoidCallback onTap;
+
+  const FoodTile({
+    super.key,
+    required this.name,
+    required this.image,
+    required this.price,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(10.0),
+      decoration: BoxDecoration(
+        color: Color(0xffececf8),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(100),
+            child: Image.asset(image, height: 100, width: 100, fit: BoxFit.cover),
+          ),
+          SizedBox(height: 10.0),
+          Text(name, style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500)),
+          SizedBox(height: 2.0),
+          Text("\$$price", style: TextStyle(fontSize: 13.0, color: Colors.grey[600])),
+          SizedBox(height: 8.0),
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: onTap,
+              child: Container(
+                padding: EdgeInsets.all(6.0),
+                decoration: BoxDecoration(
+                  color: Color(0xffef2b39),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
