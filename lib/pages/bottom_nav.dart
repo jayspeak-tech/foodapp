@@ -1,9 +1,9 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:fooddeliveryapp/pages/home.dart';
-import 'package:fooddeliveryapp/pages/order.dart';
-import 'package:fooddeliveryapp/pages/profile.dart';
-import 'package:fooddeliveryapp/pages/wallet.dart';
+import 'package:myapp/pages/home.dart';
+import 'package:myapp/pages/order.dart';
+import 'package:myapp/pages/profile.dart';
+import 'package:myapp/pages/wallet.dart';
 
 class BottomNav extends StatefulWidget {
   const BottomNav({super.key});
