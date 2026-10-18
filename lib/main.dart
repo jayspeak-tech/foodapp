@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/pages/home.dart';
+import 'package:myapp/pages/bottom_nav.dart';
 // ignore: unused_import
 import 'package:myapp/pages/onboarding.dart';
 

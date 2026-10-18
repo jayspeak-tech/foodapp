@@ -82,7 +82,7 @@ class _HomeState extends State<Home> {
             SizedBox(height: 20.0),
 
             // Category row
-            Container(
+            SizedBox(
               height: 60,
               child: ListView.builder(
                 shrinkWrap: true,

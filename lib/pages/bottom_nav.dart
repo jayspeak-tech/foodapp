@@ -1,9 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/pages/home.dart';
-import 'package:myapp/pages/order.dart';
-import 'package:myapp/pages/profile.dart';
-import 'package:myapp/pages/wallet.dart';
 
 class BottomNav extends StatefulWidget {
   const BottomNav({super.key});
@@ -13,29 +10,19 @@ class BottomNav extends StatefulWidget {
 }
 
 class _BottomNavState extends State<BottomNav> {
-  late List<Widget> pages;
-
-  late Home HomePage;
-  late Order order;
-  late Wallet wallet;
-  late Profile profilePage;
+  final List<Widget> pages = const [
+    Home(),
+    _PlaceholderPage(title: 'Orders'),
+    _PlaceholderPage(title: 'Wallet'),
+    _PlaceholderPage(title: 'Profile'),
+  ];
 
   int currentTabIndex = 0;
 
   @override
-  void initState() {
-    HomePage = Home();
-    order = Order();
-    wallet = Wallet();
-    profilePage = Profile();
-
-    pages = [HomePage, order, wallet, profilePage];
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: pages[currentTabIndex],
       bottomNavigationBar: CurvedNavigationBar(
         height: 70,
         backgroundColor: Colors.white,
@@ -56,8 +43,21 @@ class _BottomNavState extends State<BottomNav> {
           Icon(Icons.wallet, color: Colors.white, size: 30.0),
           Icon(Icons.person, color: Colors.white, size: 30.0),
         ], // CurvedNavigationBar
-        body: pages[currentTabIndex],
-      ); // Scaffold
-    }
+      ),
+    );
+  }
+}
+
+class _PlaceholderPage extends StatelessWidget {
+  const _PlaceholderPage({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: Center(child: Text('$title page')),
+    );
   }
 }
